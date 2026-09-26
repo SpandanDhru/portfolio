@@ -54,13 +54,10 @@
     font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.65;
-    transition: background-color .6s ease, color .6s ease;
   }
   a { color: var(--accent); text-underline-offset: 3px; }
-  /* Added briefly while switching themes so surfaces, borders and text fade instead of snapping */
-  :root.theme-fade *, :root.theme-fade *::before, :root.theme-fade *::after {
-    transition: background-color .6s ease, color .6s ease, border-color .6s ease, fill .6s ease, filter .6s ease !important;
-  }
+  /* Theme switches crossfade the whole page at once (View Transitions), so text and backgrounds change together */
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .6s; animation-timing-function: ease; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
   /* ---------- Navbar ---------- */
@@ -209,7 +206,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    body, .btn { transition: none; }
+    .btn { transition: none; }
   }
 </style>
 </head>
@@ -420,16 +417,15 @@
   let saved = null;
   try { saved = localStorage.getItem('sd-theme'); } catch (e) {}
   applyTheme(saved === 'light');
-  let fadeTimer;
   themeBtn.addEventListener('click', () => {
     const light = !root.classList.contains('light');
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      root.classList.add('theme-fade');
-      clearTimeout(fadeTimer);
-      fadeTimer = setTimeout(() => root.classList.remove('theme-fade'), 700);
-    }
-    applyTheme(light);
     try { localStorage.setItem('sd-theme', light ? 'light' : 'dark'); } catch (e) {}
+    // Browsers without View Transitions, and reduced-motion users, switch instantly
+    if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      applyTheme(light);
+      return;
+    }
+    document.startViewTransition(() => applyTheme(light));
   });
 
   // ---------- Resume download ----------
