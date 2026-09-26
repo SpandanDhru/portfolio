@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voxel Yeti</title>
+<style>
+  :root { --bg:#eef1f5; --panel:#ffffff; --text:#1f2328; --muted:#5f6670; --border:#d5dae1; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1b1d22; --panel:#26292f; --text:#e8eaed; --muted:#9aa1ab; --border:#3a3e46; }
+  }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text); font-family:system-ui, sans-serif; }
+  #app { display:flex; flex-direction:column; height:100%; }
+  #wrap { flex:1; min-height:300px; touch-action:none; }
+  #controls { display:flex; gap:8px; align-items:center; padding:12px 16px; background:var(--panel); border-top:1px solid var(--border); }
+  button { font:inherit; font-size:14px; padding:8px 14px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text); cursor:pointer; }
+  button.active { background:var(--text); color:var(--panel); }
+  label { margin-left:auto; display:flex; gap:6px; align-items:center; font-size:14px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="wrap"></div>
+  <div id="controls">
+    <button data-m="solo" class="active">Solo</button>
+    <button data-m="desk">At desk</button>
+    <label><input type="checkbox" id="spin" checked> Auto-spin</label>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ---------- Renderer, scene, lights ----------
+const wrap = document.getElementById('wrap');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+wrap.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+
+function resize() {
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 0.72));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+sun.position.set(4, 9, 5);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5 });
+scene.add(sun);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.ShadowMaterial({ opacity: 0.22 }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ---------- Voxel helpers ----------
+const mats = {};
+function mat(c, glow, op) {
+  const k = c + (glow ? 'g' : '') + (op || '');
+  if (mats[k]) return mats[k];
+  const m = glow ? new THREE.MeshBasicMaterial({ color: c }) : new THREE.MeshLambertMaterial({ color: c });
+  if (op) { m.transparent = true; m.opacity = op; m.depthWrite = false; }
+  return (mats[k] = m);
+}
+const geo = new THREE.BoxGeometry(1, 1, 1);
+// box(parent, width, height, depth, color, x, bottomY, z, glow?, opacity?)
+function box(g, w, h, d, c, x, y, z, glow, op) {
+  const o = new THREE.Mesh(geo, mat(c, glow, op));
+  o.scale.set(w, h, d);
+  o.position.set(x, y + h / 2, z);
+  o.castShadow = !glow && !op;
+  o.receiveShadow = !op;
+  g.add(o);
+  return o;
+}
+function grp(parent, x, y, z) { const q = new THREE.Group(); q.position.set(x, y, z); parent.add(q); return q; }
+
+// ---------- Yeti ----------
+const WH = 0xf7f9fc, SH = 0xe2e8f0, FACE = 0x6f86a8, DK = 0x44577a, HORN = 0xeadcb4, HORN2 = 0xcdb98a, BLK = 0x1a1d24;
+
+function makeYeti() {
+  const g = new THREE.Group(), P = { legs: [], arms: [] };
+
+  // Legs: hip -> knee pivots so the yeti can sit
+  [-1, 1].forEach(s => {
+    const hip = grp(g, s * 0.3, 0.67, 0);
+    box(hip, 0.4, 0.3, 0.42, WH, 0, -0.3, 0);
+    const knee = grp(hip, 0, -0.3, 0);
+    box(knee, 0.36, 0.25, 0.38, SH, 0, -0.25, 0);
+    box(knee, 0.42, 0.12, 0.52, FACE, 0, -0.37, 0.06);
+    [-0.13, 0, 0.13].forEach(x => box(knee, 0.09, 0.07, 0.07, HORN, x, -0.37, 0.35));
+    P.legs.push({ hip, knee });
+  });
+
+  // Torso
+  box(g, 1.2, 1.0, 0.85, WH, 0, 0.55, 0);
+  box(g, 1.24, 0.1, 0.89, SH, 0, 0.55, 0);
+  [-0.45, -0.15, 0.15, 0.45].forEach((x, i) => box(g, 0.22, 0.1, 0.06, i % 2 ? SH : WH, x, 0.47, 0.4));
+  box(g, 0.66, 0.6, 0.05, FACE, 0, 0.7, 0.43);
+  box(g, 0.4, 0.36, 0.03, 0x8499b8, 0, 0.8, 0.46);
+  [-1, 1].forEach(s => box(g, 0.34, 0.22, 0.5, SH, s * 0.52, 1.42, 0));
+
+  // Head
+  const head = grp(g, 0, 1.55, 0); P.head = head;
+  box(head, 1.0, 0.85, 0.85, WH, 0, 0, 0);
+  box(head, 1.04, 0.08, 0.89, SH, 0, 0.02, 0);
+  box(head, 0.78, 0.52, 0.05, FACE, 0, 0.08, 0.43);
+  [-0.36, -0.18, 0, 0.18, 0.36].forEach((x, i) =>
+    box(head, 0.2, i % 2 ? 0.14 : 0.2, 0.1, i % 2 ? SH : WH, x, i % 2 ? 0.52 : 0.46, 0.44));
+  [-0.18, 0.18].forEach(x => {
+    box(head, 0.15, 0.16, 0.04, BLK, x, 0.28, 0.46);
+    box(head, 0.06, 0.06, 0.03, 0xffffff, x + 0.04, 0.37, 0.49);
+    box(head, 0.2, 0.05, 0.04, DK, x, 0.47, 0.46);
+  });
+  box(head, 0.36, 0.08, 0.03, DK, 0, 0.12, 0.47);
+  [-0.1, 0.1].forEach(x => box(head, 0.07, 0.08, 0.03, 0xffffff, x, 0.07, 0.48));
+  [-1, 1].forEach(s => {
+    box(head, 0.17, 0.2, 0.17, HORN2, s * 0.46, 0.62, 0);
+    box(head, 0.15, 0.18, 0.15, HORN, s * 0.58, 0.78, 0);
+    box(head, 0.12, 0.14, 0.12, HORN, s * 0.62, 0.94, 0);
+  });
+  box(head, 0.28, 0.12, 0.28, WH, -0.12, 0.85, 0.08);
+  box(head, 0.18, 0.1, 0.18, SH, 0.15, 0.85, -0.12);
+
+  // Arms: shoulder -> elbow pivots
+  [-1, 1].forEach(s => {
+    const sh = grp(g, s * 0.72, 1.38, 0);
+    sh.rotation.order = 'YXZ';
+    box(sh, 0.32, 0.42, 0.36, WH, 0, -0.42, 0);
+    const el = grp(sh, 0, -0.4, 0);
+    box(el, 0.3, 0.34, 0.34, SH, 0, -0.34, 0);
+    box(el, 0.34, 0.16, 0.36, FACE, 0, -0.5, 0);
+    [-0.1, 0.1].forEach(z => box(el, 0.07, 0.06, 0.07, HORN, s * 0.1, -0.56, z));
+    P.arms.push({ sh, el, s });
+  });
+
+  return { g, P };
+}
+
+// Solo yeti
+const solo = makeYeti();
+solo.P.arms.forEach(a => (a.sh.rotation.z = a.s * 0.12));
+scene.add(solo.g);
+
+// ---------- Desk scene ----------
+const desk = new THREE.Group();
+scene.add(desk);
+
+// Seated yeti + chair, scaled to 80%
+const seat = grp(desk, 0, 0, -0.05);
+seat.scale.setScalar(0.8);
+const coder = makeYeti();
+coder.g.position.y = -0.04;
+seat.add(coder.g);
+coder.P.legs.forEach(l => { l.hip.rotation.x = -Math.PI / 2; l.knee.rotation.x = Math.PI / 2; });
+coder.P.arms.forEach(a => { a.sh.rotation.x = -0.35; a.sh.rotation.y = -a.s * 0.5; a.el.rotation.x = -1.39; });
+
+const CH = 0x2b2f38;
+box(seat, 0.95, 0.1, 0.85, CH, 0, 0.35, 0);
+box(seat, 0.9, 0.85, 0.1, CH, 0, 0.5, -0.55);
+box(seat, 0.1, 0.35, 0.1, 0x5c6370, 0, 0, 0);
+box(seat, 0.6, 0.06, 0.1, 0x5c6370, 0, 0, 0);
+box(seat, 0.1, 0.06, 0.6, 0x5c6370, 0, 0, 0);
+
+// Walnut desk
+const T = 0.74; // desk surface height
+const WAL = 0x6b4226, WAL2 = 0x553318, WAL3 = 0x7d5233, WAL4 = 0x5f3a1f;
+box(desk, 3.2, 0.07, 1.3, WAL, 0, T - 0.07, 0.95);
+[-1.1, -0.4, 0.35, 1.05].forEach((x, i) => box(desk, 0.55 + i * 0.08, 0.005, 0.03, i % 2 ? WAL4 : WAL3, x, T, 0.42 + i * 0.34));
+box(desk, 3.22, 0.02, 1.32, WAL2, 0, T - 0.09, 0.95);
+[[-1.52, 0.36], [1.52, 0.36], [-1.52, 1.54], [1.52, 1.54]].forEach(([x, z]) => box(desk, 0.08, T - 0.09, 0.08, CH, x, 0, z));
+
+// Keyboard
+box(desk, 0.8, 0.045, 0.26, BLK, 0, T, 0.5);
+for (let r = 0; r < 3; r++)
+  for (let c = 0; c < 9; c++)
+    box(desk, 0.065, 0.018, 0.065, 0x2a2d34, -0.32 + c * 0.08, T + 0.045, 0.42 + r * 0.08);
+
+// Mouse + pad (yeti's right)
+box(desk, 0.32, 0.012, 0.38, 0x23262d, -0.66, T, 0.52);
+const mouse = grp(desk, -0.66, T + 0.012, 0.5);
+box(mouse, 0.12, 0.032, 0.18, BLK, 0, 0, 0);
+box(mouse, 0.1, 0.028, 0.12, BLK, 0, 0.032, 0.02);
+box(mouse, 0.004, 0.01, 0.07, 0x3a3f4a, 0, 0.052, -0.05);
+box(mouse, 0.022, 0.018, 0.035, 0x4a505c, 0, 0.054, -0.05);
+
+// Monitor
+box(desk, 0.42, 0.03, 0.26, BLK, 0, T, 1.32);
+box(desk, 0.09, 0.36, 0.08, BLK, 0, T, 1.38);
+box(desk, 1.36, 0.8, 0.08, BLK, 0, T + 0.3, 1.3);
+const screen = grp(desk, 0, T + 0.34, 1.255);
+box(screen, 1.26, 0.72, 0.02, 0x0f1a2b, 0, 0, 0, true);
+const codeCols = [0x5dcaa5, 0xed93b1, 0xfac775, 0x85b7eb, 0xafa9ec];
+const lines = [];
+for (let i = 0; i < 9; i++) {
+  const indent = [0, 1, 1, 2, 2, 1, 2, 1, 0][i] * 0.08;
+  const w = 0.15 + ((i * 37) % 7) * 0.07;
+  const ln = grp(screen, 0, 0, -0.012);
+  box(ln, 0.1, 0.035, 0.01, codeCols[i % 5], -0.52 + indent + 0.05, 0.62 - i * 0.067, 0, true);
+  box(ln, w, 0.035, 0.01, codeCols[(i + 2) % 5], -0.52 + indent + 0.13 + w / 2, 0.62 - i * 0.067, 0, true);
+  lines.push(ln);
+}
+const cursor = box(screen, 0.03, 0.045, 0.01, 0xffffff, 0, 0, -0.014, true);
+
+// PC tower (yeti's right, glass side facing inward)
+const STL = 0x1d1f24, STL2 = 0x2a2d33, MESH = 0x34373e;
+const tw = 0.46, th = 1.0, td = 0.9;
+const tower = grp(desk, -1.18, T, 1.05);
+[[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sz]) => box(tower, 0.06, 0.04, 0.06, BLK, sx * 0.17, 0, sz * 0.36));
+const body = grp(tower, 0, 0.04, 0);
+// shell
+box(body, 0.02, th, td, STL, -tw / 2 + 0.01, 0, 0);
+box(body, tw, 0.02, td, STL, 0, 0, 0);
+box(body, tw, 0.02, td, STL, 0, th - 0.02, 0);
+box(body, tw, th, 0.02, STL, 0, 0, td / 2 - 0.01);
+// walnut top with vents
+box(body, tw + 0.02, 0.05, td + 0.02, WAL, 0, th, 0);
+for (let i = 0; i < 6; i++) box(body, 0.3, 0.006, 0.03, BLK, 0, th + 0.05, -0.3 + i * 0.1);
+// front: mesh with walnut bands, power button, LED, USB
+box(body, tw, th, 0.03, STL2, 0, 0, -td / 2);
+box(body, tw + 0.02, 0.1, 0.04, WAL, 0, th - 0.1, -td / 2 - 0.005);
+box(body, tw + 0.02, 0.06, 0.04, WAL, 0, 0, -td / 2 - 0.005);
+for (let r = 0; r < 11; r++)
+  for (let c = 0; c < 5; c++)
+    box(body, 0.05, 0.05, 0.01, MESH, -0.16 + c * 0.08, 0.1 + r * 0.072, -td / 2 - 0.02);
+box(body, 0.035, 0.035, 0.012, 0xe8e8e8, 0.15, th - 0.07, -td / 2 - 0.03);
+box(body, 0.012, 0.012, 0.01, 0xffffff, 0.15, th - 0.035, -td / 2 - 0.032, true);
+[-0.02, -0.1].forEach(x => box(body, 0.05, 0.02, 0.01, BLK, x, th - 0.065, -td / 2 - 0.03));
+box(body, 0.012, 0.02, 0.01, 0x777777, -0.17, th - 0.065, -td / 2 - 0.03);
+// solid side: exhaust fan, I/O, PSU vent
+box(body, 0.01, 0.25, 0.25, MESH, -tw / 2 - 0.005, th - 0.35, 0.25);
+box(body, 0.01, 0.3, 0.12, BLK, -tw / 2 - 0.005, th - 0.42, 0.02);
+box(body, 0.01, 0.12, 0.2, 0x3a3d44, -tw / 2 - 0.005, 0.08, 0.25);
+// glass side
+box(body, 0.02, 0.88, 0.82, 0x9aa3ad, tw / 2 - 0.01, 0.06, 0, false, 0.22);
+box(body, 0.012, th, 0.02, STL, tw / 2 - 0.006, 0, -td / 2 + 0.02);
+box(body, 0.012, th, 0.02, STL, tw / 2 - 0.006, 0, td / 2 - 0.02);
+// internals: motherboard, PSU shroud, CPU cooler, RAM, GPU
+box(body, 0.02, 0.72, 0.72, 0x2a3b30, -0.2, 0.24, 0.02);
+box(body, 0.16, 0.26, 0.4, STL2, 0, 0.02, 0.05);
+box(body, 0.14, 0.18, 0.14, 0x8c929c, -0.1, 0.64, 0.02);
+for (let i = 0; i < 5; i++) box(body, 0.142, 0.008, 0.142, 0x6b717b, -0.1, 0.66 + i * 0.035, 0.02);
+for (let i = 0; i < 4; i++) box(body, 0.1, 0.2, 0.012, BLK, -0.12, 0.58, 0.16 + i * 0.03);
+box(body, 0.22, 0.1, 0.62, 0x23262d, -0.06, 0.38, 0.0);
+box(body, 0.012, 0.08, 0.58, 0x5a606a, 0.052, 0.39, 0.0);
+[-0.14, 0.14].forEach(z => box(body, 0.014, 0.07, 0.07, 0x444851, 0.06, 0.395, z));
+
+// Headphones lying flat (yeti's left)
+const IVO = 0xefe6d2, IVO2 = 0xd9ceb6, PAD = 0x3a3a3c, GRL = 0xb8b0a0;
+const hp = grp(desk, 1.1, T, 1.12);
+hp.rotation.y = -0.35;
+[-1, 1].forEach(s => {
+  box(hp, 0.2, 0.04, 0.24, PAD, s * 0.17, 0, 0);
+  box(hp, 0.22, 0.08, 0.26, IVO, s * 0.17, 0.04, 0);
+  box(hp, 0.16, 0.012, 0.19, GRL, s * 0.17, 0.12, 0);
+  box(hp, 0.06, 0.04, 0.1, IVO2, s * 0.17, 0.04, 0.17);
+});
+[[0.19, 0.26], [0.16, 0.33], [0.1, 0.38]].forEach(([x, z]) => [-1, 1].forEach(s => box(hp, 0.07, 0.05, 0.08, IVO, s * x, 0.02, z)));
+box(hp, 0.14, 0.05, 0.07, IVO, 0, 0.02, 0.4);
+box(hp, 0.26, 0.02, 0.05, IVO2, 0, 0.07, 0.38);
+
+// Chai in a dark blue mug (yeti's left)
+const MUG = 0x1e3563, MUG2 = 0x172a4f;
+const mug = grp(desk, 0.66, T, 0.5);
+box(mug, 0.13, 0.02, 0.13, MUG2, 0, 0, 0);
+[-1, 1].forEach(s => {
+  box(mug, 0.13, 0.15, 0.02, MUG, 0, 0, s * 0.055);
+  box(mug, 0.02, 0.15, 0.09, MUG, s * 0.055, 0, 0);
+});
+box(mug, 0.09, 0.11, 0.09, 0xc8955e, 0, 0.02, 0);
+box(mug, 0.05, 0.004, 0.05, 0xe0b88a, -0.01, 0.13, 0.01);
+box(mug, 0.03, 0.025, 0.03, MUG, 0.08, 0.1, 0);
+box(mug, 0.03, 0.025, 0.03, MUG, 0.08, 0.03, 0);
+box(mug, 0.025, 0.07, 0.03, MUG, 0.095, 0.035, 0);
+const steam = [0, 1, 2].map(() => box(mug, 0.025, 0.025, 0.025, 0xffffff, 0, 0.17, 0, false, 0.55));
+
+// ---------- Modes, camera, input ----------
+let mode = 'solo';
+const camT = new THREE.Vector3(), look = new THREE.Vector3(), lookT = new THREE.Vector3();
+function setMode(m) {
+  mode = m;
+  solo.g.visible = m === 'solo';
+  desk.visible = m === 'desk';
+  if (m === 'solo') { camT.set(0, 2.3, 5.6); lookT.set(0, 1.25, 0); }
+  else { camT.set(0, 3.6, 7.2); lookT.set(0, 0.85, 0.7); desk.rotation.y = Math.PI * 0.72; }
+  document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('active', b.dataset.m === m));
+}
+setMode('solo');
+camera.position.copy(camT);
+look.copy(lookT);
+document.querySelectorAll('[data-m]').forEach(b => (b.onclick = () => setMode(b.dataset.m)));
+
+const spinBox = document.getElementById('spin');
+let drag = false, lx = 0, vel = 0;
+const el = renderer.domElement;
+const active = () => (mode === 'solo' ? solo.g : desk);
+el.addEventListener('pointerdown', e => { drag = true; lx = e.clientX; el.setPointerCapture(e.pointerId); });
+el.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const d = (e.clientX - lx) * 0.01;
+  lx = e.clientX; vel = d;
+  active().rotation.y += d;
+});
+el.addEventListener('pointerup', () => (drag = false));
+
+// ---------- Animation loop ----------
+let t = 0;
+function loop() {
+  requestAnimationFrame(loop);
+  t += 0.016;
+  if (!drag) { vel *= 0.92; active().rotation.y += vel + (spinBox.checked ? 0.006 : 0); }
+
+  // solo idle + wave
+  solo.g.position.y = Math.max(0, Math.sin(t * 2)) * 0.03;
+  solo.P.head.rotation.z = Math.sin(t * 1.3) * 0.05;
+  solo.P.arms[1].sh.rotation.z = 0.12 + Math.max(0, Math.sin(t * 1.2)) * 0.25;
+
+  // typing
+  coder.P.arms.forEach((a, i) => { a.el.rotation.x = -1.39 + Math.sin(t * 20 + i * Math.PI) * 0.05; });
+  coder.P.head.rotation.x = -0.05 + Math.sin(t * 1.1) * 0.03;
+  coder.P.head.rotation.y = Math.sin(t * 0.5) * 0.06;
+
+  // code writing itself
+  const shown = Math.floor((t * 3) % 12);
+  lines.forEach((ln, i) => (ln.visible = i < shown));
+  const cl = Math.min(shown, 8);
+  cursor.position.set(-0.32 + ((cl * 37) % 5) * 0.08, 0.62 - cl * 0.067 + 0.035 / 2, -0.014);
+  cursor.visible = Math.floor(t * 3) % 2 === 0;
+
+  // chai steam
+  steam.forEach((s, i) => {
+    const p = (t * 0.5 + i / 3) % 1;
+    s.position.set(Math.sin(p * 6 + i) * 0.02, 0.17 + p * 0.22, 0);
+    s.scale.setScalar(0.025 * (1 - p) + 0.005);
+  });
+
+  camera.position.lerp(camT, 0.08);
+  look.lerp(lookT, 0.08);
+  camera.lookAt(look);
+  renderer.render(scene, camera);
+}
+loop();
+</script>
+</body>
+</html>
