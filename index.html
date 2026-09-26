@@ -6,12 +6,12 @@
 <title>Spandan Dhru</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="description" content="Spandan Dhru. Software engineer at M&amp;T Bank building Java Spring Boot microservices and money-movement APIs.">
-<!-- Link previews (LinkedIn, Slack, iMessage...). Once the site has a domain, make og:image a full URL
-     (https://your-domain/og-image.png) and add og:url; most sites ignore relative image paths. -->
+<!-- Link previews (LinkedIn, Slack, iMessage...). og:image must be a full URL; update both if the site moves. -->
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://spandandhru.github.io/portfolio/">
 <meta property="og:title" content="Spandan Dhru">
 <meta property="og:description" content="Software engineer at M&amp;T Bank building Java Spring Boot microservices and money-movement APIs.">
-<meta property="og:image" content="/og-image.png">
+<meta property="og:image" content="https://spandandhru.github.io/portfolio/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="A pixel-art yeti next to the name Spandan Dhru, Software Engineer at M&amp;T Bank">
@@ -197,6 +197,8 @@
   .status { font-size: 14px; color: var(--muted); min-height: 1.5em; margin: 8px 0 0; }
 
   footer { margin-top: 56px; text-align: center; font-size: 13px; color: var(--muted); }
+  footer p { margin: 0; }
+  footer p + p { margin-top: 2px; }
 
   @media (max-width: 560px) {
     .nav-links { display: none; }
@@ -399,7 +401,10 @@
     <p class="status" id="resumeStatus" role="status"></p>
   </section>
 
-  <footer>© 2026 Spandan Dhru</footer>
+  <footer>
+    <p>© 2026 Spandan Dhru</p>
+    <p>Inspired by <a href="https://www.craftz.dog/" target="_blank" rel="noopener">Takuya Matsuyama's craftz.dog</a></p>
+  </footer>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

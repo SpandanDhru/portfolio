@@ -2,6 +2,8 @@
 
 My personal site: a single page with a voxel yeti coding at its desk, my work history, projects, skills and resume.
 
+**Live:** https://spandandhru.github.io/portfolio/
+
 The page is plain HTML, CSS and JavaScript with no framework. The 3D scenes are built from boxes with [Three.js](https://threejs.org/) (r128, loaded from cdnjs), and [Vite](https://vite.dev/) is used only as a dev server and for the production build.
 
 ## Running locally
@@ -20,14 +22,20 @@ npm run build     # outputs to dist/
 npm run preview   # serves dist/ to check the build
 ```
 
-Deploy the contents of `dist/` to any static host (GitHub Pages, Netlify, Vercel, Cloudflare Pages).
+## Deployment
 
-After deploying, update the `og:image` tag in `index.html` to the full URL (`https://your-domain/og-image.png`) and add an `og:url` tag. Most link-preview crawlers ignore relative image paths.
+The site is hosted on GitHub Pages. Every push to `main` runs `.github/workflows/deploy.yml`, which builds the site and publishes `dist/`. Progress shows in the repo's **Actions** tab, and the live site updates a minute or two after the run finishes.
+
+`vite.config.js` sets `base: './'` so all asset paths are relative. The build works at `/portfolio/` today and would keep working unchanged on a custom domain.
+
+If the URL ever changes (for example, a custom domain), update the `og:url` and `og:image` tags in `index.html`. Link-preview crawlers need a full URL for the image. After deploying, paste the URL into [LinkedIn's Post Inspector](https://www.linkedin.com/post-inspector/) to refresh its cached preview.
 
 ## Project layout
 
 ```
 index.html                  the whole site: markup, styles and scripts
+vite.config.js              build config (relative asset paths)
+.github/workflows/          GitHub Pages deploy workflow
 favicon.svg                 pixel yeti, also used as the navbar logo
 icons/                      skill and tech logos
 public/resume.pdf           the downloadable resume, copied to the build as-is
@@ -47,5 +55,6 @@ yeti-desk-standalone.html   standalone version of the desk yeti scene
 
 ## Credits
 
+- Design inspired by [Takuya Matsuyama](https://www.craftz.dog/)'s site, craftz.dog.
 - Tech logos from [Devicon](https://devicon.dev/) (MIT) and [Simple Icons](https://simpleicons.org/) (CC0). The logos are trademarks of their respective owners.
 - Fonts: [Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans), [IBM Plex Sans and IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Sans), via Google Fonts.
