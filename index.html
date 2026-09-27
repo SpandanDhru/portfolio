@@ -143,6 +143,10 @@
   .role-title { font-weight: 600; }
   .role-org { color: var(--muted); grid-column: 1; }
   .role-desc { grid-column: 1 / -1; font-size: 14px; color: var(--muted); margin-top: 4px; max-width: 60ch; }
+  .role .skills, .role-links { grid-column: 1 / -1; margin-top: 10px; }
+  .role-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  .poster-link[hidden] { display: none; }
+  .project-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
   .role-date {
     font-family: var(--font-mono); font-size: 13px; color: var(--muted);
     font-variant-numeric: tabular-nums; grid-column: 2; grid-row: 1 / span 2; align-self: center; text-align: right;
@@ -261,7 +265,7 @@
 
   <section id="about" class="bio">
     <h2>About</h2>
-    <p>I'm a software engineer at M&amp;T Bank, building Java Spring Boot microservices and money-movement APIs across distributed backend systems. Outside work, I build real-time and AI-powered tools for things I actually use.</p>
+    <p>I'm a software engineer on the Money Movement APIs team at M&amp;T Bank, building payment microservices in Java, Spring Boot, and SQL Server. Outside work, I build real-time systems and AI tools for things I actually use, mostly in Go and Python.</p>
   </section>
 
   <section id="work">
@@ -270,20 +274,43 @@
       <li class="role">
         <span class="role-title">Software Engineer <span class="now">Now</span></span>
         <span class="role-org">M&amp;T Bank · Buffalo, NY</span>
-        <span class="role-desc">Building payment systems and developer tooling with Java, Spring Boot, Python and cloud technologies.</span>
         <span class="role-date">Jul 2025 – Present</span>
+        <span class="role-desc">Engineer on the Money Movement APIs team, building payment microservices in Java, Spring Boot, and SQL Server.</span>
+        <ul class="skills">
+          <li><img src="icons/java.svg" alt="" width="20" height="20">Java</li>
+          <li><img src="icons/springboot.svg" alt="" width="20" height="20">Spring Boot</li>
+          <li><img src="icons/microsoftsqlserver.svg" alt="" width="20" height="20">Microsoft SQL Server</li>
+          <li><img src="icons/azure.svg" alt="" width="20" height="20">Azure</li>
+          <li><img src="icons/gitlab.svg" alt="" width="20" height="20">GitLab</li>
+        </ul>
       </li>
       <li class="role">
         <span class="role-title">Software Engineer Intern</span>
         <span class="role-org">Immuta · College Park, MD</span>
-        <span class="role-desc">Built the policy tools customers use to control who can access their data.</span>
         <span class="role-date">May 2024 – Dec 2024</span>
+        <span class="role-desc">Built the policy tools customers use to control who can access their data.</span>
+        <ul class="skills">
+          <li><img src="icons/typescript.svg" alt="" width="20" height="20">TypeScript</li>
+          <li><img src="icons/angular.svg" alt="" width="20" height="20">Angular</li>
+          <li><img src="icons/nodejs.svg" alt="" width="20" height="20">Node.js</li>
+          <li><img src="icons/postgresql.svg" alt="" width="20" height="20">PostgreSQL</li>
+        </ul>
       </li>
       <li class="role">
         <span class="role-title">Undergraduate Researcher</span>
         <span class="role-org">University of Maryland · College Park, MD</span>
-        <span class="role-desc">Applied machine learning and quantum computing to particle physics research.</span>
         <span class="role-date">Jan 2022 – Aug 2023</span>
+        <span class="role-desc">Applied machine learning and quantum computing to particle physics research.</span>
+        <ul class="skills">
+          <li><img src="icons/python.svg" alt="" width="20" height="20">Python</li>
+          <li><img src="icons/qiskit.svg" alt="" width="20" height="20">IBM Qiskit</li>
+        </ul>
+        <!-- Posters: drop the PDFs at public/posters/research-poster-1.pdf and -2.pdf and rename the labels.
+             A link hides itself until its file exists. -->
+        <div class="role-links">
+          <a class="gh-link poster-link" href="posters/research-poster-1.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Research poster 1 (PDF)</a>
+          <a class="gh-link poster-link" href="posters/research-poster-2.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Research poster 2 (PDF)</a>
+        </div>
       </li>
     </ul>
   </section>
@@ -292,28 +319,51 @@
     <h2>Projects</h2>
     <div class="projects">
       <article class="project">
-        <div class="stage" id="pawnStage" aria-label="A voxel chess pawn"></div>
-        <div>
-          <h3>Savant</h3>
-          <p>An AI chess coaching agent that learns from your actual games. It pulls your history from Chess.com and Lichess, runs every move through Stockfish to find your mistakes, and lets you talk to a coach that can open your games, analyze positions live, and show them on the board as it explains.</p>
-          <ul class="skills"><li><img src="icons/python.svg" alt="" width="20" height="20">Python</li><li><span class="skill-badge" aria-hidden="true">AI</span>OpenAI API</li><li><img src="icons/fastapi.svg" alt="" width="20" height="20">FastAPI</li><li><img src="icons/react.svg" alt="" width="20" height="20">React</li><li><img src="icons/electron.svg" alt="" width="20" height="20">Electron</li><li><img src="icons/sqlite.svg" alt="" width="20" height="20">SQLite</li></ul>
-          <a class="gh-link" href="https://github.com/SpandanDhru/chess-coach" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
-            View on GitHub
-          </a>
-        </div>
-      </article>
-
-      <article class="project">
         <div class="stage" id="swordStage" aria-label="A golden voxel sword"></div>
         <div>
           <h3>Yorm</h3>
-          <p>A live battle map for tabletop RPGs. Players move their tokens on a shared grid in real time while a Go server runs initiative, movement, HP and dice. Every change is saved as an event, so a crashed session comes back exactly as it was.</p>
-          <ul class="skills"><li><img src="icons/go.svg" alt="" width="20" height="20">Go</li><li><img src="icons/websockets.svg" alt="" width="20" height="20">WebSockets</li><li><img src="icons/typescript.svg" alt="" width="20" height="20">TypeScript</li><li><img src="icons/react.svg" alt="" width="20" height="20">React</li><li><img src="icons/konva.svg" alt="" width="20" height="20">Konva</li><li><img src="icons/postgresql.svg" alt="" width="20" height="20">PostgreSQL</li></ul>
+          <p>A live battle map for tabletop RPGs, built for (and used by) my own D&amp;D group. An event-sourced Go server runs the table in real time, holds up at 3,000 concurrent players, and restores a crashed session exactly where the game left off, with no lost moves.</p>
+          <ul class="skills">
+            <li><img src="icons/go.svg" alt="" width="20" height="20">Go</li>
+            <li><img src="icons/websockets.svg" alt="" width="20" height="20">WebSockets</li>
+            <li><img src="icons/postgresql.svg" alt="" width="20" height="20">PostgreSQL</li>
+            <li><img src="icons/docker.svg" alt="" width="20" height="20">Docker</li>
+            <li><img src="icons/react.svg" alt="" width="20" height="20">React</li>
+            <li><img src="icons/typescript.svg" alt="" width="20" height="20">TypeScript</li>
+          </ul>
+          <div class="project-links">
           <a class="gh-link" href="https://github.com/SpandanDhru/yorm" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
             View on GitHub
           </a>
+          <a class="gh-link" href="https://yorm.fly.dev/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+            Open Yorm
+          </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="project">
+        <div class="stage" id="pawnStage" aria-label="A voxel chess pawn"></div>
+        <div>
+          <h3>Savant</h3>
+          <p>A RAG-powered chess coach grounded in your own games. Stockfish handles the analysis and the LLM explains only the moments that matter.</p>
+          <ul class="skills">
+            <li><img src="icons/python.svg" alt="" width="20" height="20">Python</li>
+            <li><img src="icons/fastapi.svg" alt="" width="20" height="20">FastAPI</li>
+            <li><span class="skill-badge" aria-hidden="true">AI</span>OpenAI API</li>
+            <li><img src="icons/stockfish.svg" alt="" width="20" height="20">Stockfish</li>
+            <li><img src="icons/sqlite.svg" alt="" width="20" height="20">SQLite</li>
+            <li><img src="icons/react.svg" alt="" width="20" height="20">React</li>
+            <li><img src="icons/electron.svg" alt="" width="20" height="20">Electron</li>
+          </ul>
+          <div class="project-links">
+          <a class="gh-link" href="https://github.com/SpandanDhru/chess-coach" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+            View on GitHub
+          </a>
+          </div>
         </div>
       </article>
 
@@ -323,10 +373,12 @@
           <h3>Momo</h3>
           <p>A Discord music bot that streams audio into voice channels on demand. It pulls tracks from YouTube, Spotify, and direct file links, and manages a live queue with real-time playback controls.</p>
           <ul class="skills"><li><img src="icons/typescript.svg" alt="" width="20" height="20">TypeScript</li><li><img src="icons/nodejs.svg" alt="" width="20" height="20">Node.js</li><li><img src="icons/discord.svg" alt="" width="20" height="20">Discord.js</li></ul>
-          <a class="gh-link" href="https://github.com/SpandanDhru/momo" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
-            View on GitHub
-          </a>
+          <div class="project-links">
+            <a class="gh-link" href="https://github.com/SpandanDhru/momo" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+              View on GitHub
+            </a>
+          </div>
         </div>
       </article>
     </div>
@@ -339,28 +391,27 @@
       <ul class="skills">
         <li><img src="icons/java.svg" alt="" width="20" height="20">Java</li>
         <li><img src="icons/python.svg" alt="" width="20" height="20">Python</li>
+        <li><img src="icons/go.svg" alt="" width="20" height="20">Go</li>
         <li><img src="icons/sql.svg" alt="" width="20" height="20">SQL</li>
         <li><img src="icons/typescript.svg" alt="" width="20" height="20">TypeScript</li>
         <li><img src="icons/javascript.svg" alt="" width="20" height="20">JavaScript</li>
-        <li><img src="icons/go.svg" alt="" width="20" height="20">Go</li>
       </ul>
     </div>
     <div class="skill-group">
-      <h3>Frameworks &amp; Libraries</h3>
+      <h3>Backend</h3>
       <ul class="skills">
         <li><img src="icons/springboot.svg" alt="" width="20" height="20">Spring Boot</li>
-        <li><img src="icons/spring.svg" alt="" width="20" height="20">Spring Data JPA</li>
-        <li><img src="icons/junit.svg" alt="" width="20" height="20">JUnit</li>
-        <li><span class="skill-badge" aria-hidden="true">M</span>Mockito</li>
+        <li><img src="icons/spring.svg" alt="" width="20" height="20">Spring Data JPA / Hibernate</li>
         <li><img src="icons/fastapi.svg" alt="" width="20" height="20">FastAPI</li>
-        <li><img src="icons/react.svg" alt="" width="20" height="20">React</li>
         <li><img src="icons/nodejs.svg" alt="" width="20" height="20">Node.js</li>
-        <li><img src="icons/angular.svg" alt="" width="20" height="20">Angular</li>
-        <li><img src="icons/electron.svg" alt="" width="20" height="20">Electron</li>
+        <li><img src="icons/rest.svg" alt="" width="20" height="20">REST</li>
+        <li><img src="icons/websockets.svg" alt="" width="20" height="20">WebSockets</li>
+        <li><img src="icons/junit.svg" alt="" width="20" height="20">JUnit</li>
+        <li><img src="icons/maven.svg" alt="" width="20" height="20">Maven</li>
       </ul>
     </div>
     <div class="skill-group">
-      <h3>Databases</h3>
+      <h3>Data</h3>
       <ul class="skills">
         <li><img src="icons/microsoftsqlserver.svg" alt="" width="20" height="20">Microsoft SQL Server</li>
         <li><img src="icons/postgresql.svg" alt="" width="20" height="20">PostgreSQL</li>
@@ -369,19 +420,29 @@
       </ul>
     </div>
     <div class="skill-group">
-      <h3>Cloud &amp; DevOps</h3>
+      <h3>Infrastructure</h3>
       <ul class="skills">
-        <li><img src="icons/azure.svg" alt="" width="20" height="20">Azure</li>
-        <li><img src="icons/aws-dark.svg" alt="" width="20" height="20" class="on-dark"><img src="icons/aws.svg" alt="" width="20" height="20" class="on-light">AWS</li>
         <li><img src="icons/docker.svg" alt="" width="20" height="20">Docker</li>
-        <li><img src="icons/openshift.svg" alt="" width="20" height="20">OpenShift</li>
         <li><img src="icons/kubernetes.svg" alt="" width="20" height="20">Kubernetes</li>
+        <li><img src="icons/openshift.svg" alt="" width="20" height="20">OpenShift</li>
+        <li><img src="icons/aws-dark.svg" alt="" width="20" height="20" class="on-dark"><img src="icons/aws.svg" alt="" width="20" height="20" class="on-light">AWS</li>
+        <li><img src="icons/azure.svg" alt="" width="20" height="20">Azure</li>
         <li><img src="icons/gitlab.svg" alt="" width="20" height="20">GitLab CI/CD</li>
-        <li><img src="icons/maven.svg" alt="" width="20" height="20">Maven</li>
+        <li><img src="icons/githubactions.svg" alt="" width="20" height="20">GitHub Actions</li>
+        <li><img src="icons/prometheus.svg" alt="" width="20" height="20"><img src="icons/grafana.svg" alt="" width="20" height="20">Prometheus / Grafana</li>
+        <li><img src="icons/flyio-dark.svg" alt="" width="20" height="20" class="on-dark"><img src="icons/flyio.svg" alt="" width="20" height="20" class="on-light">Fly.io</li>
       </ul>
     </div>
     <div class="skill-group">
-      <h3>AI &amp; Developer Tools</h3>
+      <h3>Frontend</h3>
+      <ul class="skills">
+        <li><img src="icons/react.svg" alt="" width="20" height="20">React</li>
+        <li><img src="icons/typescript.svg" alt="" width="20" height="20">TypeScript</li>
+        <li><img src="icons/angular.svg" alt="" width="20" height="20">Angular</li>
+      </ul>
+    </div>
+    <div class="skill-group">
+      <h3>AI &amp; Tooling</h3>
       <ul class="skills">
         <li><img src="icons/claude-code.svg" alt="" width="20" height="20">Claude Code</li>
         <li><span class="skill-badge" aria-hidden="true">&gt;_</span>Codex</li>
@@ -446,6 +507,14 @@
       return;
     }
     document.startViewTransition(() => applyTheme(light));
+  });
+
+  // ---------- Research posters: hide any link whose PDF hasn't been added yet ----------
+  document.querySelectorAll('.poster-link').forEach(link => {
+    link.hidden = true;
+    fetch(link.getAttribute('href'), { method: 'HEAD' })
+      .then(res => { link.hidden = !(res.ok && (res.headers.get('content-type') || '').includes('pdf')); })
+      .catch(() => {});
   });
 
   // ---------- Resume download ----------
