@@ -13,7 +13,7 @@ npm install
 npm run dev       # http://127.0.0.1:5173 — reloads on save
 ```
 
-`resume.pdf` is fetched by the download button, so the page needs to be served over HTTP. Opening `index.html` directly from disk won't work for that.
+Serve the page over HTTP (as above) rather than opening `index.html` from disk; the icons, posters and resume load by relative path.
 
 ## Building
 
@@ -45,7 +45,7 @@ yeti-desk-standalone.html   standalone version of the desk yeti scene
 
 ## Common edits
 
-- **Resume:** replace `public/resume.pdf`. It downloads as `Spandan_Dhru_Resume.pdf` (set by `RESUME_NAME` in the script).
+- **Resume:** replace `public/resume.pdf`. It downloads as `Spandan_Dhru_Resume.pdf` (set by the `download` attribute on the Download Resume link).
 - **Skills and project tags:** edit the `<ul class="skills">` lists. Each item is an icon from `icons/` plus a label.
 - **3D models:** each scene is created with `makeStage(element, options)` in the script. Useful options:
   - `spin`: auto-rotation speed in radians per frame (the desk yeti uses `0.002`, the project models `0.003`)
